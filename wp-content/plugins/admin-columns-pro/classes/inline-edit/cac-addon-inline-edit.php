@@ -155,6 +155,7 @@ class CACIE_Addon_InlineEdit {
 	 */
 	public function get_model( $key ) {
 		$models = $this->get_models();
+
 		return isset( $models[ $key ] ) ? $models[ $key ] : false;
 	}
 
@@ -241,7 +242,7 @@ class CACIE_Addon_InlineEdit {
 				'errors'        => array(
 					'field_required' => __( 'This field is required.', 'codepress-admin-columns' ),
 					'invalid_float'  => __( 'Please enter a valid float value.', 'codepress-admin-columns' ),
-					'invalid_floats' => __( 'Please enter valid float values.', 'codepress-admin-columns' )
+					'invalid_floats' => __( 'Please enter valid float values.', 'codepress-admin-columns' ),
 				),
 				'inline_edit'   => __( 'Inline Edit', 'codepress-admin-columns' ),
 			) );
@@ -268,11 +269,11 @@ class CACIE_Addon_InlineEdit {
 			wp_localize_script( 'cacie-admin-edit', 'CACIE_Items', $editable_model->get_items() );
 			wp_localize_script( 'cacie-admin-edit', 'CACIE', array(
 				'inline_edit'   => array(
-					'active' => $editable_model->get_editability_preference()
+					'active' => $editable_model->get_editability_preference(),
 				),
 				'layout'        => $storage_model->get_layout(),
 				'storage_model' => $storage_model->key,
-				'nonce'         => wp_create_nonce( 'ac-editing' )
+				'nonce'         => wp_create_nonce( 'ac-editing' ),
 			) );
 
 		}
@@ -358,7 +359,7 @@ class CACIE_Addon_InlineEdit {
 					__( 'Allow creating new terms', 'codepress-admin-columns' ),
 					array(
 						'on'  => __( 'Yes' ),
-						'off' => __( 'No' )
+						'off' => __( 'No' ),
 					),
 					'', // description
 					'edit' // toggle_id
@@ -476,8 +477,8 @@ class CACIE_Addon_InlineEdit {
 		$jsondata = array(
 			'success' => true,
 			'data'    => array(
-				'value' => $contents
-			)
+				'value' => $contents,
+			),
 		);
 
 		// We don't want a Nullable rawvalue  in our JSON because select2 will break
@@ -563,7 +564,7 @@ class CACIE_Addon_InlineEdit {
 						$display_format = array( 'first_name', 'last_name' );
 					}
 					$options = $editable_model->get_users_options( array(
-						'search' => '*' . $search . '*'
+						'search' => '*' . $search . '*',
 					), $display_format );
 					break;
 
@@ -575,7 +576,7 @@ class CACIE_Addon_InlineEdit {
 							break;
 						case 'user_by_id':
 							$options = $editable_model->get_users_options( array(
-								'search' => '*' . $search . '*'
+								'search' => '*' . $search . '*',
 							) );
 							break;
 					}
@@ -588,81 +589,21 @@ class CACIE_Addon_InlineEdit {
 						case 'page_link':
 						case 'post_object':
 
-							// ACF 5
-							if ( function_exists( 'acf_get_setting' ) ) {
-								$field = ( $column->get_field_type() == 'post_object' ) ? new acf_field_post_object() : new acf_field_page_link();
-								$choices = $field->get_choices( array(
-									's'         => $search,
-									'field_key' => $column->get_field_hash(),
-									'post_id'   => $_GET['item_id']
-								) );
+							$field = $column->get_field();
 
-								$options = array();
-
-								foreach ( $choices as $choice ) {
-									if ( ! isset( $choice['id'] ) ) {
-										$options[ $choice['text'] ] = array(
-											'label'   => $choice['text'],
-											'options' => array()
-										);
-
-										foreach ( $choice['children'] as $subchoice ) {
-											$options[ $choice['text'] ]['options'][ $subchoice['id'] ] = $subchoice['text'];
-										}
-									}
-									else {
-										$options[ $choice['id'] ] = $choice['text'];
-									}
-								}
+							$post_type = 'any';
+							if ( ! empty( $field['post_type'] ) ) {
+								$post_type = $field['post_type'];
 							}
 
-							// ACF 4
-							else {
-								$field = $column->get_field();
-
-								$post_type = 'any';
-								if ( ! empty( $field['post_type'] ) ) {
-									$post_type = $field['post_type'];
-								}
-
-								$options = $editable_model->get_posts_options( array( 's' => $search, 'post_type' => $post_type ) );
-							}
+							$options = $editable_model->get_posts_options( array( 's' => $search, 'post_type' => $post_type ) );
 
 							break;
 						case 'user':
-							if ( function_exists( 'acf_get_setting' ) ) {
 
-								$field = new acf_field_user();
-								$choices = $field->get_choices( array(
-									's'         => $search,
-									'field_key' => $column->get_field_hash(),
-									'post_id'   => $_GET['item_id']
-								) );
-
-								$options = array();
-
-								foreach ( $choices as $choice ) {
-									if ( ! isset( $choice['id'] ) ) {
-										$options[ $choice['text'] ] = array(
-											'label'   => $choice['text'],
-											'options' => array()
-										);
-
-										foreach ( $choice['children'] as $subchoice ) {
-											$options[ $choice['text'] ]['options'][ $subchoice['id'] ] = $subchoice['text'];
-										}
-									}
-									else {
-										$options[ $choice['id'] ] = $choice['text'];
-									}
-								}
-
-							}
-							else {
-								$options = $editable_model->get_users_options( array(
-									'search' => '*' . $search . '*'
-								) );
-							}
+							$options = $editable_model->get_users_options( array(
+								'search' => '*' . $search . '*',
+							) );
 
 							break;
 					}
@@ -671,7 +612,7 @@ class CACIE_Addon_InlineEdit {
 				case 'author':
 				case 'column-user': // comment column
 					$options = $editable_model->get_users_options( array(
-						'search' => '*' . $search . '*'
+						'search' => '*' . $search . '*',
 					) );
 					break;
 

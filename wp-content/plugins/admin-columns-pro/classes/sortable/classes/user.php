@@ -51,7 +51,7 @@ class CAC_Sortable_Model_User extends CAC_Sortable_Model {
 
 			// WooCommerce
 			'column-wc-user-orders',
-			'column-wc-user-order_count'
+			'column-wc-user-order_count',
 		);
 
 		return array_merge( $column_names, (array) $this->get_default_sortables() );
@@ -66,7 +66,7 @@ class CAC_Sortable_Model_User extends CAC_Sortable_Model {
 		$columns = array(
 			'username',
 			'name',
-			'email'
+			'email',
 		);
 
 		return $columns;
@@ -226,7 +226,7 @@ class CAC_Sortable_Model_User extends CAC_Sortable_Model {
 					$is_numeric = in_array( $column->get_option( 'field_type' ), array(
 						'numeric',
 						'library_id',
-						'count'
+						'count',
 					) );
 					$sort_flag = $is_numeric ? SORT_NUMERIC : SORT_REGULAR;
 				}
@@ -234,11 +234,8 @@ class CAC_Sortable_Model_User extends CAC_Sortable_Model {
 
 			case 'column-acf_field' :
 				if ( method_exists( $column, 'get_field' ) ) {
-					$is_sortable = $this->set_acf_sorting_vars( $column, $vars );
-					if ( ! $is_sortable ) {
-						$sort_flag = SORT_REGULAR;
-						$_users = $this->get_acf_sorting_data( $column, $this->get_user_ids_by_query( $user_query ) );
-					}
+					$sort_flag = SORT_REGULAR;
+					$_users = $this->get_acf_sorting_data( $column, $this->get_user_ids_by_query( $user_query ) );
 				}
 				break;
 

@@ -796,8 +796,9 @@ abstract class CAC_Filtering_Model {
 	 * Dropdown markup
 	 * @since 3.6
 	 */
-	private function display_dropdown( $column_name, $options, $add_empty_option, $current_item = '', $top_label = '' ) { ?>
-		<select class="postform cpac_filter<?php echo ( '' !== $current_item ) ? ' active' : ''; ?>" name="cpac_filter[<?php echo $column_name; ?>]" data-current="<?php echo esc_attr( urlencode( $current_item ) ); ?>">
+	private function display_dropdown( $column_name, $options, $add_empty_option, $current_item = '', $top_label = '', $label ) { ?>
+		<label for="cpac_filter_<?php echo $column_name; ?>" class="screen-reader-text"><?php echo sprintf( __( 'Filter by %s', 'codepress-admin-columns' ), $label ); ?></label>
+		<select class="postform cpac_filter<?php echo ( '' !== $current_item ) ? ' active' : ''; ?>" name="cpac_filter[<?php echo $column_name; ?>]" id="cpac_filter_<?php echo $column_name; ?>" data-current="<?php echo esc_attr( urlencode( $current_item ) ); ?>">
 			<?php if ( $top_label ) : ?>
 				<option value="">
 					<?php echo $top_label; ?>
@@ -864,7 +865,7 @@ abstract class CAC_Filtering_Model {
 		 */
 		$top_label = apply_filters( 'cac/addon/filtering/dropdown_top_label', $top_label, $column );
 
-		$this->display_dropdown( $column->properties->name, $options, $add_empty_option, $current_item, $top_label );
+		$this->display_dropdown( $column->properties->name, $options, $add_empty_option, $current_item, $top_label, $column->get_option( 'label' ) );
 	}
 
 	public function use_cache() {
