@@ -19,8 +19,6 @@ services:
       - pressman
   mysql:
     image: mysql:5.7
-    volumes:
-        - /Users/taichi/www/farmland/docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
     environment:
       MYSQL_ROOT_PASSWORD: pman7170
     networks:
