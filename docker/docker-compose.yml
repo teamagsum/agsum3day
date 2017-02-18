@@ -6,7 +6,7 @@ services:
       - 8080:80
     environment:
       WORDPRESS_DB_PASSWORD: pman7170
-      WORDPRESS_DB_NAME: test
+      WORDPRESS_DB_NAME: ichba
       WORDPRESS_TABLE_PREFIX: wp_
       WORDPRESS_DEFINED_CONSTANTS: '{"WP_HOME":"http://dev.ich-ba.jp:8080","WP_SITEURL":"http://dev.ich-ba.jp:8080"}'
 #      WORDPRESS_DEFINED_CONSTANTS: '{"WP_HOME":"http://dev.ich-ba.jp:8080","WP_SITEURL":"http://dev.ich-ba.jp:8080"}'
