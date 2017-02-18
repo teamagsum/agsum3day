@@ -1,0 +1,17 @@
+FROM pressman/php:7-apache-mysql
+RUN apt-get update && apt-get install -y  libssh2-1-dev unzip \
+    && cd /root/ \
+    && curl -O -L https://github.com/Sean-Der/pecl-networking-ssh2/archive/php7.zip \
+    && unzip php7.zip \
+    && rm php7.zip \
+    && cd pecl-networking-ssh2-php7/ \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && cd .. \
+    && rm -rf pecl-networking-ssh2-php7/ \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+CMD ["apache2-foreground"]

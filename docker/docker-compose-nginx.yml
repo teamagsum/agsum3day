@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  nginx:
+    build: images/nginx/
+    image: pressman:yaritori-nginx
+    ports:
+      - 8080:443
+#    networks:
+#      - pressman
+#networks:
+#  pressman:

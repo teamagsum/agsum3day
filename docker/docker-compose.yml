@@ -1,0 +1,29 @@
+version: '2'
+services:
+  ichba:
+    image: pressman/wordpress:4.7-php7.0-apache-mysql
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_PASSWORD: pman7170
+      WORDPRESS_DB_NAME: test
+      WORDPRESS_TABLE_PREFIX: wp_
+      WORDPRESS_DEFINED_CONSTANTS: '{"WP_HOME":"http://dev.ich-ba.jp:8080","WP_SITEURL":"http://dev.ich-ba.jp:8080"}'
+#      WORDPRESS_DEFINED_CONSTANTS: '{"WP_HOME":"http://dev.ich-ba.jp:8080","WP_SITEURL":"http://dev.ich-ba.jp:8080"}'
+    volumes:
+      - /Users/taichi/www/farmland/wp-content:/var/www/html/wp-content
+      - /Users/taichi/www/farmland/wp-config.php:/tmp/wp-config2.php
+#    extra_hosts:
+#      - "dev.ich-ba.jp:172.18.0.2"
+    networks:
+      - pressman
+  mysql:
+    image: mysql:5.7
+    volumes:
+        - /Users/taichi/www/farmland/docker/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: pman7170
+    networks:
+      - pressman
+networks:
+  pressman:

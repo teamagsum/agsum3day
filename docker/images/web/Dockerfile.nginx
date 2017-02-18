@@ -1,0 +1,45 @@
+FROM php:7-apache
+RUN a2enmod rewrite expires
+# install the PHP extensions we need
+RUN apt-get update && apt-get install -y libpng12-dev libjpeg-dev mariadb-client-10.0 \
+    && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
+    && docker-php-ext-install gd mysqli opcache mbstring \
+    && mkdir -m 777 /var/log/php \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y vim postfix rsyslog && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && usermod -u 1000 www-data \
+    && groupmod -g 1000 www-data
+
+
+MAINTAINER NGINX Docker Maintainers "docker-maint@nginx.com"
+
+ENV NGINX_VERSION 1.9.14-1~jessie
+
+RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 \
+    && echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install --no-install-recommends --no-install-suggests -y \
+                        ca-certificates \
+                        nginx=${NGINX_VERSION} \
+                        nginx-module-xslt \
+                        nginx-module-geoip \
+                        nginx-module-image-filter \
+                        nginx-module-perl \
+                        nginx-module-njs \
+                        gettext-base \
+    && rm -rf /var/lib/apt/lists/*
+
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+
+RUN mkdir -p /var/www/app/html && chown -R www-data:www-data /var/www/app
+
+COPY etc/apache2/apache2.conf /etc/apache2/apache2.conf
+COPY etc/php/php.ini /usr/local/etc/php/php.ini
+COPY etc/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY etc/nginx/conf.d/vhost.conf /etc/nginx/conf.d/vhost.conf
+COPY docker-entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["nginx", "-g", "daemon off;"]
